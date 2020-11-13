@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
     private SpriteRenderer sr;
     private Rigidbody2D rb;
+    private Animator an;
     
     public float speed = 5f;
     public bool isFacingRight = true;
@@ -28,6 +29,7 @@ public class Player : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+        an = GetComponent<Animator>();
 
         // wHeight: the bottom part of the Player
         wHeight = GetComponent<Collider2D>().bounds.extents.y + 0.1f;
@@ -45,7 +47,7 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(horzMove * speed, vect.y);
 
         // Check movement direction and make player face towards direction
-        FlipPlayer(horzMove);
+        FlipPlayer(-horzMove);
 
         /*** VERTICAL MOVEMENT ***/
         // Get Vertical Movement (Jumping)
@@ -54,6 +56,9 @@ public class Player : MonoBehaviour
         {
             if (vertMove > 0f)
             {
+                an.SetBool("IsIdle", false);
+                an.SetBool("IsJumping", true);
+                an.Play("JumpUBegin");
                 isJumping = true;
             }
         }
@@ -78,6 +83,7 @@ public class Player : MonoBehaviour
         // Check if Jumping time period has elapsed
         if (jumpButtonPressTime > maxJumpTime)
         {
+            an.SetBool("IsJumping", false);
             vertMove = 0f;
         }
     }
