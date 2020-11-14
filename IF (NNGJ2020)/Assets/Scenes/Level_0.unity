@@ -777,7 +777,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 342362645}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.54, y: -4.82, z: 0}
+  m_LocalPosition: {x: 30.3, y: -2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -797,8 +797,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   isFacingRight: 1
-  jumpSpeed: 7.5
+  jumpSpeed: 8
   isJumping: 0
+  wallJumpY: 10
   fallMultiplier: 2.5
   lowJumpMultiplier: 2
   onGround: 0
@@ -806,6 +807,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   direction: {x: 0, y: 0}
+  dashTime: 0.75
+  isDashing: 0
+  dashForce: 16
+  startDashTimer: 0.25
 --- !u!95 &342362651
 Animator:
   serializedVersion: 3
@@ -1229,7 +1234,7 @@ GameObject:
   - component: {fileID: 570538309}
   - component: {fileID: 570538308}
   - component: {fileID: 570538307}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84489,7 +84494,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 647700257}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 30.4, y: -2.7, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -84513,7 +84518,7 @@ MonoBehaviour:
   enableVerticalCameraMovement: 1
   minX: 0
   minY: 0
-  maxX: 100
+  maxX: 1000
   maxY: 100
 --- !u!1 &713371716
 GameObject:
