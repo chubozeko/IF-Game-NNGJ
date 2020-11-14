@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerCameraMovement : MonoBehaviour
 {
     public Transform cameraTarget;
-    public float cameraSpeed;
+    public float cameraSpeed = 5;
     public bool enableHorizontalCameraMovement;
     public bool enableVerticalCameraMovement;
     public float minX;
@@ -16,10 +16,10 @@ public class PlayerCameraMovement : MonoBehaviour
     private void Start()
     {
         minX = 0;
-        maxX = 8;
+        // maxX = 8;
         minY = 0;
-        maxY = 8;
-        cameraSpeed = 5;
+        // maxY = 8;
+        // cameraSpeed = 5;
     }
 
     void FixedUpdate()
