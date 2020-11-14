@@ -662,18 +662,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.061703205, y: -0.039170027}
+  m_Offset: {x: 0.15002346, y: -0.07128644}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.28, y: 1.28}
+    oldSize: {x: 2.6666667, y: 2.6666667}
     newSize: {x: 7.54, y: 11.33}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.82970333, y: 0.8892255}
+  m_Size: {x: 1.8413715, y: 1.9169517}
   m_EdgeRadius: 0
 --- !u!212 &342362648
 SpriteRenderer:
@@ -1218,7 +1218,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 11.25
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
