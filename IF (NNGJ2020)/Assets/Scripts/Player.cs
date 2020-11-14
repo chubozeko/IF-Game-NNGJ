@@ -8,9 +8,13 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private Animator an;
 
+    private ParticleSystem ps;
+
     private Texture2D mColorSwapTex;
 
     private Color[] mSpriteColors;
+
+    private Vector2 lastVelocity;
     
     public float speed = 5f;
     public bool isFacingRight = true;
@@ -41,6 +45,7 @@ public class Player : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         an = GetComponent<Animator>();
+        ps = GetComponent<ParticleSystem>();
 
         // wHeight: the bottom part of the Player
         wHeight = GetComponent<Collider2D>().bounds.extents.y + 0.1f;
@@ -119,6 +124,7 @@ public class Player : MonoBehaviour
             an.SetBool("IsIdle", true);
         }
 
+        lastVelocity = rb.velocity;
         an.SetFloat("horzMove", horzMove);
         an.SetFloat("vertMove", vertMove);
     }
@@ -176,7 +182,28 @@ public class Player : MonoBehaviour
         health -= damage;
         if (health <= 0f)
         {
-            Destroy(gameObject);
+
+            var nv = lastVelocity.normalized * 60;
+
+            var shp = ps.shape;
+
+            if (nv != Vector2.zero) {
+                float angle = Mathf.Atan2(nv.x, nv.y) * Mathf.Rad2Deg;                
+                shp.rotation = new Vector3(angle - 90f, 90.0f, 0.0f);
+            } else {
+                shp.rotation = new Vector3(-90f, -90f, 0f);
+            }
+        
+            ps.Emit(80);
+
+            //Destroy(gameObject);
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision) {
+        //    Debug.Log("Collided with " + collision.gameObject.name);
+        if (collision.gameObject.CompareTag("Trap")) {
+            GetHit(1000f);            
         }
     }
 
