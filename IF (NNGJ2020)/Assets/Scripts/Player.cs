@@ -8,10 +8,16 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private Animator an;
 
+    private Camera cam;
+
+    private ParticleSystem ps;
+
     private Texture2D mColorSwapTex;
 
     private Color[] mSpriteColors;
-    
+
+    private Vector2 lastVelocity;
+
     public float speed = 5f;
     public bool isFacingRight = true;
     private float wHeight;
@@ -56,6 +62,9 @@ public class Player : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         an = GetComponent<Animator>();
+        ps = GetComponent<ParticleSystem>();
+
+        cam = Camera.main;
 
         // wHeight: the bottom part of the Player
         wHeight = GetComponent<Collider2D>().bounds.extents.y + 0.1f;
@@ -124,7 +133,7 @@ public class Player : MonoBehaviour
         {
             isJumping = false;
             jumpButtonPressTime = 0f;
-            
+
             an.SetBool("IsJumping", false);
         }
 
@@ -162,6 +171,7 @@ public class Player : MonoBehaviour
             }
         }
 
+        lastVelocity = rb.velocity;
         an.SetFloat("horzMove", horzMove);
         an.SetFloat("vertMove", vertMove);
     }
@@ -185,7 +195,7 @@ public class Player : MonoBehaviour
                 rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
             }
         }
-        
+
         /*
         else if (rb.velocity.y > 0 && Input.GetButton("Jump") && !onGround)
         {
@@ -204,7 +214,7 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(Vector2.up * jumpSpeed, ForceMode2D.Impulse);
 
-        
+
 
         isJumping = false;
     }
@@ -275,9 +285,40 @@ public class Player : MonoBehaviour
     public void GetHit(float damage)
     {
         health -= damage;
+        ShakeBehaviour shk;
+        if (cam.TryGetComponent<ShakeBehaviour>(out shk)) {
+            shk.TriggerShake();
+        }
+
         if (health <= 0f)
         {
-            Destroy(gameObject);
+
+            PlayerDies();
+            //Destroy(gameObject);
+        }
+    }
+
+    public void PlayerDies() {
+
+            var nv = lastVelocity.normalized * 60;
+
+            var shp = ps.shape;
+
+            if (nv != Vector2.zero) {
+                float angle = Mathf.Atan2(nv.x, nv.y) * Mathf.Rad2Deg;
+                shp.rotation = new Vector3(angle - 90f, 90.0f, 0.0f);
+            } else {
+                shp.rotation = new Vector3(-90f, -90f, 0f);
+            }
+
+            ps.Emit(80);
+
+    }
+
+    void OnCollisionEnter2D(Collision2D collision) {
+        //    Debug.Log("Collided with " + collision.gameObject.name);
+        if (collision.gameObject.CompareTag("Trap")) {
+            GetHit(1000f);
         }
     }
 
