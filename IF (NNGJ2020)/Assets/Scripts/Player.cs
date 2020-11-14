@@ -21,8 +21,15 @@ public class Player : MonoBehaviour
     public bool isJumping = false;
     private float jumpButtonPressTime = 0f;
     private float maxJumpTime = 0.2f;
+    public float fallMultiplier = 2.5f;
+    public float lowJumpMultiplier = 2f;
 
     private float rayCastLength = 0.005f;
+
+    [Header("Collision")]
+    public bool onGround = false;
+    public LayerMask groundLayer;
+    public Vector2 direction;
 
     void Start()
     {
@@ -58,21 +65,37 @@ public class Player : MonoBehaviour
         /*** VERTICAL MOVEMENT ***/
         // Get Vertical Movement (Jumping)
         float vertMove = Input.GetAxisRaw("Vertical");
-        if (IsOnGround() && isJumping == false)
+        if (IsOnGround() && isJumping == false && (Input.GetButtonDown("Jump") || vertMove > 0))
         {
-            if (vertMove > 0f)
+            if (Input.GetButton("Jump") || vertMove > 0)
             {
+                isJumping = true;
                 an.SetBool("IsIdle", false);
                 an.SetBool("IsJumping", true);
                 an.Play("JumpUBegin");
-                isJumping = true;
+                Jump();
+
+            } else
+            {
+                isJumping = false;
+                an.SetBool("IsIdle", true);
+                an.SetBool("IsJumping", false);
             }
         }
 
-        // Check if Player is busy jumping & jump time hasn't elapsed yet
+        // Check if Player is jumping & jump time hasn't elapsed yet
+        /*
         if (isJumping && jumpButtonPressTime < maxJumpTime)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
+        }
+        */
+        // Check if Jumping time period has elapsed
+        if (jumpButtonPressTime > maxJumpTime)
+        {
+            vertMove = 0f;
+            isJumping = false;
+            an.SetBool("IsJumping", false);
         }
 
         // Check if Player is still busy jumping
@@ -84,16 +107,43 @@ public class Player : MonoBehaviour
         {
             isJumping = false;
             jumpButtonPressTime = 0f;
+            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier / 2) * Time.deltaTime;
+            an.SetBool("IsJumping", false);
         }
 
-        // Check if Jumping time period has elapsed
-        if (jumpButtonPressTime > maxJumpTime)
+        if (!onGround && vertMove == 0)
         {
-            an.SetBool("IsJumping", false);
-            vertMove = 0f;
+            an.SetBool("IsIdle", false);
+        } else
+        {
+            an.SetBool("IsIdle", true);
         }
+
+        an.SetFloat("horzMove", horzMove);
+        an.SetFloat("vertMove", vertMove);
     }
 
+    private void Update()
+    {
+        onGround = Physics2D.Raycast(
+            new Vector2(transform.position.x, transform.position.y - wHeight),
+            Vector2.down, 0.6f, groundLayer);
+
+        direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+        an.SetBool("IsJumping", isJumping);
+        
+    }
+
+    private void Jump()
+    {
+        isJumping = true;
+        an.SetBool("IsJumping", true);
+        an.Play("JumpUBegin");
+        rb.velocity = new Vector2(rb.velocity.x, 0);
+        rb.AddForce(Vector2.up * jumpSpeed, ForceMode2D.Impulse);
+        isJumping = false;
+    }
     private void FlipPlayer(float horzMove)
     {
         // Face RIGHT
@@ -128,5 +178,12 @@ public class Player : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        // wHeight = ;
+        Gizmos.DrawLine(new Vector2(transform.position.x, GetComponent<Collider2D>().bounds.extents.y + 0.1f), transform.position + (Vector3.down * rayCastLength));
     }
 }
