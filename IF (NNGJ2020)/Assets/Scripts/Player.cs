@@ -8,6 +8,8 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private Animator an;
 
+    private Camera cam;
+
     private ParticleSystem ps;
 
     private Texture2D mColorSwapTex;
@@ -46,6 +48,8 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         an = GetComponent<Animator>();
         ps = GetComponent<ParticleSystem>();
+
+        cam = Camera.main;
 
         // wHeight: the bottom part of the Player
         wHeight = GetComponent<Collider2D>().bounds.extents.y + 0.1f;
@@ -180,8 +184,20 @@ public class Player : MonoBehaviour
     public void GetHit(float damage)
     {
         health -= damage;
+        ShakeBehaviour shk;
+        if (cam.TryGetComponent<ShakeBehaviour>(out shk)) {
+            shk.TriggerShake();
+        }
+
         if (health <= 0f)
         {
+
+            PlayerDies();
+            //Destroy(gameObject);
+        }
+    }
+
+    public void PlayerDies() {
 
             var nv = lastVelocity.normalized * 60;
 
@@ -196,8 +212,6 @@ public class Player : MonoBehaviour
         
             ps.Emit(80);
 
-            //Destroy(gameObject);
-        }
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
