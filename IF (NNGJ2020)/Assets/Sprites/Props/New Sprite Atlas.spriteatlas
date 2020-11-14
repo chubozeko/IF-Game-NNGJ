@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: New Sprite Atlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 0
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 0
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 845724eda23c96349b5e7d6779502a1a, type: 3}
+    - {fileID: 2800000, guid: adac6595148873c45aeb6eb2eba390a6, type: 3}
+    - {fileID: 2800000, guid: 627683d28677d9b4b8b208abe0951700, type: 3}
+    - {fileID: 2800000, guid: 415b256dbdd9af549a0a6dc5f1ccdc0b, type: 3}
+    - {fileID: 2800000, guid: 3e532424022bf3d4d83dae1789e7cca9, type: 3}
+    - {fileID: 2800000, guid: f74cfedf867fe5f4fa0c93e67a90f2a0, type: 3}
+    - {fileID: 2800000, guid: 0c1d3ad1e4af2dd40bb329fdf864c3c1, type: 3}
+    - {fileID: 2800000, guid: a69434bd828150a4c93d4205b471ea4b, type: 3}
+    - {fileID: 2800000, guid: 4f968550f97a52646a1f32868fb68956, type: 3}
+    - {fileID: 2800000, guid: ec0b89882e7987142bff1361b1d0a004, type: 3}
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 4f968550f97a52646a1f32868fb68956, type: 3}
+  - {fileID: 21300000, guid: 0c1d3ad1e4af2dd40bb329fdf864c3c1, type: 3}
+  - {fileID: 21300000, guid: 627683d28677d9b4b8b208abe0951700, type: 3}
+  - {fileID: 21300000, guid: 3e532424022bf3d4d83dae1789e7cca9, type: 3}
+  - {fileID: 21300000, guid: adac6595148873c45aeb6eb2eba390a6, type: 3}
+  - {fileID: 21300000, guid: ec0b89882e7987142bff1361b1d0a004, type: 3}
+  - {fileID: 21300000, guid: 415b256dbdd9af549a0a6dc5f1ccdc0b, type: 3}
+  - {fileID: 21300000, guid: a69434bd828150a4c93d4205b471ea4b, type: 3}
+  - {fileID: 21300000, guid: 845724eda23c96349b5e7d6779502a1a, type: 3}
+  - {fileID: 21300000, guid: f74cfedf867fe5f4fa0c93e67a90f2a0, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Gas0024
+  - Gas0018
+  - Gas0006
+  - Gas0012
+  - Gas0003
+  - Gas0027
+  - Gas0009
+  - Gas0021
+  - Gas0000
+  - Gas0015
+  m_Tag: New Sprite Atlas
+  m_IsVariant: 0
