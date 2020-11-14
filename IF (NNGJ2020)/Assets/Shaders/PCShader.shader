@@ -3,8 +3,8 @@
 	Properties
 	{
 		[PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
-		_SwapTex("Color Data", 2D) = "transparent" {}
 		_Color("Tint", Color) = (1,1,1,1)
+		_RepCol("Color Mask", Color) = (1,0,1,1)
 		[MaterialToggle] PixelSnap("Pixel snap", Float) = 0
 		[HideInInspector] _RendererColor("RendererColor", Color) = (1,1,1,1)
 		[HideInInspector] _Flip("Flip", Vector) = (1,1,1,1)
@@ -30,16 +30,13 @@
 
 				Pass
 				{
-					CGPROGRAM
+				CGPROGRAM
 					#pragma vertex SpriteVert
 					#pragma fragment SpriteFrag
 					#pragma target 2.0
 					#pragma multi_compile_instancing
 					#pragma multi_compile_local _ PIXELSNAP_ON
 					#pragma multi_compile _ ETC1_EXTERNAL_ALPHA#
-
-					#ifndef UNITY_SPRITES_INCLUDED
-					#define UNITY_SPRITES_INCLUDED
 
 					#include "UnityCG.cginc"
 
@@ -73,7 +70,7 @@
 						float4 vertex   : POSITION;
 						float4 color    : COLOR;
 						float2 texcoord : TEXCOORD0;
-						UNITY_VERTEX_INPUT_INSTANCE_ID
+    					UNITY_VERTEX_INPUT_INSTANCE_ID
 					};
 
 					struct v2f
@@ -81,7 +78,6 @@
 						float4 vertex   : SV_POSITION;
 						fixed4 color    : COLOR;
 						float2 texcoord : TEXCOORD0;
-						UNITY_VERTEX_OUTPUT_STEREO
 					};
 
 					inline float4 UnityFlipSprite(in float3 pos, in fixed2 flip)
@@ -111,7 +107,7 @@
 					sampler2D _MainTex;
 					sampler2D _AlphaTex;
 
-					sampler2D _SwapTex;
+					fixed4 _RepCol;
 
 					fixed4 SampleSpriteTexture (float2 uv)
 					{
@@ -128,16 +124,20 @@
 					fixed4 SpriteFrag(v2f IN) : SV_Target
 					{
 						fixed4 c = SampleSpriteTexture (IN.texcoord);
-						fixed4 swapCol = tex2D(_SwapTex, float2(c.g, 0));
+						fixed4 swapCol = c;
+
+						[flatten] if (all(c.rgb == fixed3(0,1,0))) {
+							swapCol.rgb = _RepCol.rgb;
+						}
+						
 						fixed4 final = lerp(c, swapCol, swapCol.a) * IN.color;
+						
 						final.a = c.a;
-						final.rgb *= c.a;
+						final.rgb *= c.a;						
 						return final;
 					}
-
-					#endif // UNITY_SPRITES_INCLUDED
 					
-					ENDCG
-					}
+				ENDCG
 				}
+		}
 }
