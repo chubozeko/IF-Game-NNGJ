@@ -17,18 +17,17 @@ public class Player : MonoBehaviour
     public float jumpSpeed = 7f;
     public bool isJumping = false;
     private float jumpButtonPressTime = 0f;
-    private float maxJumpTime = 0.2f;
+    public float maxJumpTime = 0.2f;
     public float fallMultiplier = 2.5f;
     public float lowJumpMultiplier = 2f;
     public float wallJumpY = 10f;
+    public bool isWallJumping = false;
 
     private float rayCastLength = 0.005f;
 
     [Header("Dashing")]
-    public float dashSpeed;
     private float dashTime;
     public float startDashTime;
-    private int direction;
     public float dashForce;
     public float startDashTimer;
     float currentDashTimer;
@@ -61,6 +60,9 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
+        onGround = IsOnGround();
+        onWall = IsOnWall();
+
         /*** HORIZONTAL MOVEMENT ***/
         // Get Horizontal Movement (Walking)
         float horzMove = Input.GetAxisRaw("Horizontal");
@@ -75,18 +77,14 @@ public class Player : MonoBehaviour
         /*** VERTICAL MOVEMENT ***/
         // Get Vertical Movement (Jumping)
         float vertMove = Input.GetAxisRaw("Vertical");
+        
         if (Input.GetButtonDown("Jump") || vertMove > 0f)
         {
-            // Wall Jumps
-            if (onWall && !onGround)
-            {
-                rb.velocity = new Vector2(-GetWallDirection() * speed * -.75f, wallJumpY);
-            }
-
             isJumping = true;
             rb.velocity = Vector2.up * jumpSpeed;
         }
-
+        
+        /*
         if (IsOnGround() && isJumping == false)
         {
             if (vertMove > 0f)
@@ -94,6 +92,7 @@ public class Player : MonoBehaviour
                 isJumping = true;
             }
         }
+        */
 
         // Check if Player is busy jumping & jump time hasn't elapsed yet
         if (isJumping && jumpButtonPressTime < maxJumpTime)
@@ -102,7 +101,7 @@ public class Player : MonoBehaviour
         }
 
         // Check if Player is still busy jumping
-        if (vertMove >= 1f)
+        if (Input.GetButton("Jump")) // || (vertMove > 0f))
         {
             jumpButtonPressTime += Time.deltaTime;
         }
@@ -115,7 +114,8 @@ public class Player : MonoBehaviour
         // Check if Jumping time period has elapsed
         if (jumpButtonPressTime > maxJumpTime)
         {
-            vertMove = 0f;
+            rb.velocity = Vector2.zero;
+            // vertMove = 0f;
         }
 
         /* DASHING */
@@ -144,27 +144,34 @@ public class Player : MonoBehaviour
             // Slide on Walls
             rb.velocity = new Vector2(rb.velocity.x, -wallSlideSpeed);
         }
-
         if (onWall && Input.GetButton("WallGrab"))
         {
             rb.velocity = new Vector2(rb.velocity.x, vertMove * speed);
         }
-
-        onGround = IsOnGround();
-        onWall = IsOnWall();
+        
+        // Wall Jumps
+        if (rb.velocity.x > 0 && onWall && !onGround)
+        {
+            isWallJumping = true;
+            Invoke("SetWallJumpingToFalse", 0.05f);
+        }
+        if (isWallJumping)
+        {
+            rb.velocity = new Vector2(-GetWallDirection() * speed, wallJumpY);
+        }
     }
 
     private void Update()
     {
+        float vertMove = Input.GetAxisRaw("Vertical");
         if (rb.velocity.y < 0)
         {
             rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
-
         }
         else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
         {
             rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
-        }
+        }   
     }
 
     private void FlipPlayer(float horzMove)
@@ -225,10 +232,13 @@ public class Player : MonoBehaviour
             rayCastLength))
         {
             return 1;
+        } else
+        {
+            return 0;
         }
-        return 0;
     }
 
+    public void SetWallJumpingToFalse() { isWallJumping = false; }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
