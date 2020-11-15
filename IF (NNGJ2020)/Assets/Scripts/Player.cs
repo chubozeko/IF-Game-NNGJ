@@ -49,6 +49,8 @@ public class Player : MonoBehaviour
     public float startDashTimer = 0.25f;
     float currentDashTimer;
     int dashDir;
+    [Header("check point")]
+    public Transform lastCheckPoint;
 
     void Start()
     {
