@@ -21,6 +21,10 @@ public class Player : MonoBehaviour {
 
     private Vector2 lastVelocity;
 
+    private bool isDying = false;
+
+    private float deathAnim = 4.0f;
+
     public float speed = 5f;
     public bool isFacingRight = true;
     private float wHeight;
@@ -78,6 +82,20 @@ public class Player : MonoBehaviour {
     }
 
     void FixedUpdate () {
+
+        if (isDying) {
+            deathAnim -= Time.fixedDeltaTime;
+
+            if (deathAnim <= 0)
+            {
+                deathAnim = 2;
+                isDying = false;
+                finishDeath();
+            }
+            return;
+        }
+
+
         /*** HORIZONTAL MOVEMENT ***/
         // Get Horizontal Movement (Walking)
         float horzMove = Input.GetAxisRaw ("Horizontal");
@@ -279,6 +297,14 @@ public class Player : MonoBehaviour {
         }
 
         ps.Emit (80);
+
+        isDying = true;
+    }
+
+    public void finishDeath() {
+
+        SceneManager.LoadScene (0);
+
         //Attempts to load scene at 0 or reset position 
         playerObject.transform.position = lastCheckPoint.transform.position;
 
@@ -287,7 +313,6 @@ public class Player : MonoBehaviour {
     void OnCollisionEnter2D (Collision2D collision) {
         //    Debug.Log("Collided with " + collision.gameObject.name);
         if (collision.gameObject.CompareTag ("Trap")) {
-            SceneManager.LoadScene (0);
             GetHit (1000f);
         }
     }
