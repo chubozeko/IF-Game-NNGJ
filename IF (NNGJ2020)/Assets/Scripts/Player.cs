@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour {
 
     public GameObject playerObject;
+    public GameObject winScreen;
     private SpriteRenderer sr;
     private Rigidbody2D rb;
     private Animator an;
@@ -288,6 +289,11 @@ public class Player : MonoBehaviour {
         if (collision.gameObject.CompareTag ("Trap")) {
             SceneManager.LoadScene (0);
             GetHit (1000f);
+        }
+    }
+    void OnCollisionEnter2D (Collider other) {
+        if (other.gameObject.CompareTag ("Win")) {
+            winScreen.SetActive(true);
         }
     }
 
