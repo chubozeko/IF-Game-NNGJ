@@ -17,14 +17,17 @@ public class Player : MonoBehaviour
     private Color[] mSpriteColors;
 
     private Vector2 lastVelocity;
-    
+
     public float speed = 5f;
     public bool isFacingRight = true;
     private float wHeight;
+    private float wWidth;
     private float health = 100f;
 
+    [Header("Jumping")]
     public float jumpSpeed = 7f;
     public bool isJumping = false;
+    public float wallJumpY = 10f;
     private float jumpButtonPressTime = 0f;
     private float maxJumpTime = 0.2f;
     public float fallMultiplier = 2.5f;
@@ -37,9 +40,21 @@ public class Player : MonoBehaviour
     public LayerMask groundLayer;
     public Vector2 direction;
 
+    [Header("Dashing")]
+    // public float dashSpeed;
+    public float dashTime = 0.25f;
+    // public float startDashTime;
+    public bool isDashing = false;
+    public float dashForce = 8f;
+    public float startDashTimer = 0.25f;
+    float currentDashTimer;
+    int dashDir;
+
     void Start()
     {
         health = 100f;
+
+        currentDashTimer = startDashTimer;
     }
 
     private void Awake()
@@ -53,6 +68,8 @@ public class Player : MonoBehaviour
 
         // wHeight: the bottom part of the Player
         wHeight = GetComponent<Collider2D>().bounds.extents.y + 0.1f;
+        // wWidth: the right part of the Player
+        wWidth = GetComponent<Collider2D>().bounds.extents.x + 0.1f;
 
         sr.material.SetColor("_RepCol", new Color(1.0f, 0.0f, 0.0f, 0.5f));
     }
@@ -74,9 +91,9 @@ public class Player : MonoBehaviour
         /*** VERTICAL MOVEMENT ***/
         // Get Vertical Movement (Jumping)
         float vertMove = Input.GetAxisRaw("Vertical");
-        if (IsOnGround() && isJumping == false && (Input.GetButtonDown("Jump") || vertMove > 0))
+        if (IsOnGround() && isJumping == false) // && (Input.GetButtonDown("Jump") || vertMove > 0))
         {
-            if (Input.GetButton("Jump") || vertMove > 0)
+            if (Input.GetButtonDown("Jump") || vertMove > 0)
             {
                 isJumping = true;
                 an.SetBool("IsIdle", false);
@@ -116,7 +133,7 @@ public class Player : MonoBehaviour
         {
             isJumping = false;
             jumpButtonPressTime = 0f;
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier / 2) * Time.deltaTime;
+
             an.SetBool("IsJumping", false);
         }
 
@@ -128,6 +145,32 @@ public class Player : MonoBehaviour
             an.SetBool("IsIdle", true);
         }
 
+        /* WALL JUMP */
+        if (IsOnWall() && !IsOnGround() && horzMove == 1)
+        {
+            rb.velocity = new Vector2(-GetWallDirection() * speed * -.75f, wallJumpY);
+        }
+
+        /* DASHING */
+        if (Input.GetButtonDown("Dash") && direction.x != 0)
+        {
+            isDashing = true;
+            currentDashTimer = startDashTimer;
+            dashDir = (int)horzMove;
+            rb.velocity = Vector2.zero;
+        }
+
+        if (isDashing)
+        {
+            rb.velocity = transform.right * dashDir * dashForce;
+            currentDashTimer -= Time.deltaTime;
+
+            if (currentDashTimer <= 0)
+            {
+                isDashing = false;
+            }
+        }
+
         lastVelocity = rb.velocity;
         an.SetFloat("horzMove", horzMove);
         an.SetFloat("vertMove", vertMove);
@@ -137,12 +180,30 @@ public class Player : MonoBehaviour
     {
         onGround = Physics2D.Raycast(
             new Vector2(transform.position.x, transform.position.y - wHeight),
-            Vector2.down, 0.6f, groundLayer);
+            Vector2.down, rayCastLength, groundLayer);
 
         direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
+        if (!onGround)
+        {
+            if (rb.velocity.y < 0)
+            {
+                rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+            }
+            else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
+            {
+                rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+            }
+        }
+
+        /*
+        else if (rb.velocity.y > 0 && Input.GetButton("Jump") && !onGround)
+        {
+            rb.velocity = Vector2.zero;
+        }
+       */
+
         an.SetBool("IsJumping", isJumping);
-        
     }
 
     private void Jump()
@@ -152,6 +213,9 @@ public class Player : MonoBehaviour
         an.Play("JumpUBegin");
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(Vector2.up * jumpSpeed, ForceMode2D.Impulse);
+
+
+
         isJumping = false;
     }
     private void FlipPlayer(float horzMove)
@@ -175,10 +239,47 @@ public class Player : MonoBehaviour
         bool groundCheck = Physics2D.Raycast(
             new Vector2(transform.position.x, transform.position.y - wHeight),
             -Vector2.up,
-            rayCastLength);
+            rayCastLength, groundLayer);
 
         if (groundCheck) return true;
         else return false;
+    }
+    public bool IsOnWall()
+    {
+        bool wallCheck1 = Physics2D.Raycast(
+            new Vector2(transform.position.x - wWidth, transform.position.y),
+            Vector2.left,
+            rayCastLength, groundLayer);
+        bool wallCheck2 = Physics2D.Raycast(
+            new Vector2(transform.position.x + wWidth, transform.position.y),
+            Vector2.right,
+            rayCastLength, groundLayer);
+
+        // onWall = wallCheck1 || wallCheck2;
+        if (wallCheck1 || wallCheck2) return true;
+        else return false;
+    }
+
+    public int GetWallDirection()
+    {
+        if (Physics2D.Raycast(new Vector2(transform.position.x - wWidth,
+            transform.position.y),
+            Vector2.left,
+            rayCastLength, groundLayer))
+        {
+            return -1;
+        }
+        else if (Physics2D.Raycast(new Vector2(transform.position.x + wWidth,
+            transform.position.y),
+            Vector2.right,
+            rayCastLength, groundLayer))
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     public void GetHit(float damage)
@@ -204,12 +305,12 @@ public class Player : MonoBehaviour
             var shp = ps.shape;
 
             if (nv != Vector2.zero) {
-                float angle = Mathf.Atan2(nv.x, nv.y) * Mathf.Rad2Deg;                
+                float angle = Mathf.Atan2(nv.x, nv.y) * Mathf.Rad2Deg;
                 shp.rotation = new Vector3(angle - 90f, 90.0f, 0.0f);
             } else {
                 shp.rotation = new Vector3(-90f, -90f, 0f);
             }
-        
+
             ps.Emit(80);
 
     }
@@ -217,14 +318,15 @@ public class Player : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision) {
         //    Debug.Log("Collided with " + collision.gameObject.name);
         if (collision.gameObject.CompareTag("Trap")) {
-            GetHit(1000f);            
+            GetHit(1000f);
         }
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        // wHeight = ;
-        Gizmos.DrawLine(new Vector2(transform.position.x, GetComponent<Collider2D>().bounds.extents.y + 0.1f), transform.position + (Vector3.down * rayCastLength));
+        Gizmos.DrawLine(
+            new Vector2(transform.position.x, transform.position.y - wHeight),
+            new Vector2(transform.position.x, transform.position.y - wHeight - rayCastLength));
     }
 }
