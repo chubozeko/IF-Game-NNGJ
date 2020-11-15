@@ -22,7 +22,11 @@ public class ShakeBehaviour : MonoBehaviour
 
     void OnEnable()
     {
-        initialPosition = transform.localPosition;
+        // initialPosition = transform.localPosition;
+        initialPosition = new Vector3(
+            gameObject.GetComponent<PlayerCameraMovement>().cameraTarget.position.x,
+            gameObject.GetComponent<PlayerCameraMovement>().cameraTarget.position.y,
+            transform.position.z);
     }
 
 
@@ -41,6 +45,11 @@ public class ShakeBehaviour : MonoBehaviour
             shakeDuration -= Time.deltaTime * dampingSpeed;
         } else {
             shakeDuration = 0f;
+            
+            initialPosition = new Vector3(
+            gameObject.GetComponent<PlayerCameraMovement>().cameraTarget.position.x,
+            gameObject.GetComponent<PlayerCameraMovement>().cameraTarget.position.y,
+            transform.position.z);
             transform.localPosition = initialPosition;
         }
     }
