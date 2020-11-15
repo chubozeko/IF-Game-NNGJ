@@ -37,4 +37,11 @@ public class GasCanShooter : MonoBehaviour
             timeToEmit = fireInterval;
         }
     }
+
+    void OnDrawGizmos() {
+        Gizmos.color = Color.red;        
+
+        Gizmos.DrawLine(new Vector2(transform.position.x, transform.position.y),
+            new Vector2(transform.position.x, transform.position.y) + (Vector2)gameObject.transform.up.normalized * (projectileSpeed / 5));
+    }
 }
