@@ -14,8 +14,9 @@ public class Launcher : MonoBehaviour
     }
 
     void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.CompareTag("Player")){
-            other.gameObject.GetComponent<Rigidbody2D>().AddForce(other.transform.up * launchForceValue);
+        if (other.gameObject.tag=="Player"){
+            Rigidbody2D rb = other.gameObject.GetComponent<Rigidbody2D>();
+            rb.AddForce(other.transform.up * launchForceValue);
         }
     }
 }

@@ -77,7 +77,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerCameraMovement: {fileID: 0}
-  launchForceValue: 0
+  launchForceValue: 1000
 --- !u!212 &8920338264447452835
 SpriteRenderer:
   m_ObjectHideFlags: 0
